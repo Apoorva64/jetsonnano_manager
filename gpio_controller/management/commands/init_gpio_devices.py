@@ -60,11 +60,14 @@ class Command(BaseCommand):
                     description=f'Jetson Nano connection - Reset: GPIO{reset_pin}, Recovery: GPIO{recovery_pin}'
                 )
 
-                # Setup GPIO pins for this connection (output mode, initial HIGH)
-                gpio_service.setup_pins(connection.reset, connection.force_recovery)
                 self.stdout.write(
-                    f'Created connection: {connection.name} (Reset: GPIO{reset_pin}, Recovery: GPIO{recovery_pin}) - GPIO pins initialized')
+                    f'Created connection: {connection.name} (Reset: GPIO{reset_pin}, Recovery: GPIO{recovery_pin})')
                 created_connections += 1
+
+            # Always setup GPIO pins for this connection (output mode, initial HIGH)
+            gpio_service.setup_pins(connection.reset, connection.force_recovery)
+            self.stdout.write(
+                f'  ✓ GPIO pins initialized for {connection.name} (Reset: GPIO{connection.reset}, Recovery: GPIO{connection.force_recovery})')
 
             # Create corresponding device if it doesn't exist
             device_name = f'Jetson-Nano-{reset_pin}-{recovery_pin}'
