@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from gpio_controller.models import GPIOConnection, JetsonNanoDevice
+from gpio_controller.services import get_gpio_service
 
 
 class Command(BaseCommand):
@@ -29,6 +30,7 @@ class Command(BaseCommand):
         ]
 
         usb_ports = options.get('usb_ports', default_usb_ports)
+        gpio_service = get_gpio_service()
 
         self.stdout.write('Using fixed pin pairs: 26:19, 13:6, 5:11, 9:10, 22:27, 17:4, 3:2')
 
@@ -58,8 +60,10 @@ class Command(BaseCommand):
                     description=f'Jetson Nano connection - Reset: GPIO{reset_pin}, Recovery: GPIO{recovery_pin}'
                 )
 
+                # Setup GPIO pins for this connection (output mode, initial HIGH)
+                gpio_service.setup_pins(connection.reset, connection.force_recovery)
                 self.stdout.write(
-                    f'Created connection: {connection.name} (Reset: GPIO{reset_pin}, Recovery: GPIO{recovery_pin})')
+                    f'Created connection: {connection.name} (Reset: GPIO{reset_pin}, Recovery: GPIO{recovery_pin}) - GPIO pins initialized')
                 created_connections += 1
 
             # Create corresponding device if it doesn't exist
