@@ -91,6 +91,8 @@ class GPIOService:
 
         try:
             if self.initialized:
+                # Ensure pin is set up as output before using it
+                GPIO.setup(pin, GPIO.OUT, initial=GPIO.HIGH)
                 GPIO.output(pin, GPIO.LOW)
                 logger.debug(f"Pulse started on GPIO{pin}")
                 time.sleep(duration)
@@ -120,6 +122,8 @@ class GPIOService:
 
         try:
             if self.initialized:
+                # Ensure pin is set up as output before using it
+                GPIO.setup(pin, GPIO.OUT, initial=GPIO.HIGH)
                 GPIO.output(pin, GPIO.LOW)
                 logger.debug(f"Holding GPIO{pin} LOW")
                 time.sleep(duration)
@@ -152,6 +156,10 @@ class GPIOService:
 
         try:
             if self.initialized:
+                # Ensure pins are set up as outputs before using them
+                GPIO.setup(pin_a, GPIO.OUT, initial=GPIO.HIGH)
+                GPIO.setup(pin_b, GPIO.OUT, initial=GPIO.HIGH)
+                
                 # Hold pin_a LOW
                 GPIO.output(pin_a, GPIO.LOW)
                 logger.debug(f"Sequence A->B: holding GPIO{pin_a} LOW")
@@ -193,6 +201,10 @@ class GPIOService:
 
         try:
             if self.initialized:
+                # Ensure pins are set up as outputs before using them
+                GPIO.setup(pin_a, GPIO.OUT, initial=GPIO.HIGH)
+                GPIO.setup(pin_b, GPIO.OUT, initial=GPIO.HIGH)
+                
                 # Hold pin_b LOW
                 GPIO.output(pin_b, GPIO.LOW)
                 logger.debug(f"Sequence B->A: holding GPIO{pin_b} LOW")
@@ -215,6 +227,20 @@ class GPIOService:
 
         return False
 
+    def force_recovery_sequence(self, force_recovery_pin: int, reset_pin: int, hold_time: float = 2.0) -> bool:
+        """
+        Execute force recovery sequence: hold force recovery pin LOW, then pulse reset pin.
+        
+        Args:
+            force_recovery_pin: GPIO pin for force recovery
+            reset_pin: GPIO pin for reset
+            hold_time: Duration in seconds to hold force recovery pin low
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        return self.sequence_ab(force_recovery_pin, reset_pin, hold_time=hold_time)
+
     def set_pin_state(self, pin: int, state: bool) -> bool:
         """
         Set a pin to HIGH (True) or LOW (False).
@@ -232,6 +258,8 @@ class GPIOService:
 
         try:
             if self.initialized:
+                # Ensure pin is set up as output before using it
+                GPIO.setup(pin, GPIO.OUT, initial=GPIO.HIGH)
                 GPIO.output(pin, GPIO.HIGH if state else GPIO.LOW)
                 logger.debug(f"GPIO{pin} set to {'HIGH' if state else 'LOW'}")
                 return True
